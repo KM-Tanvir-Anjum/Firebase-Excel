@@ -1,0 +1,32 @@
+function getAllData() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getActiveSheet();
+
+  var firebaseUrl = "https://bus-ticket-56131-default-rtdb.firebaseio.com/Feedback";
+  var base = FirebaseApp.getDatabaseByUrl(firebaseUrl);
+
+  // Get the data directly, no need to wrap it in an array
+  var dataSet = base.getData();
+
+  // Check if there is data
+  if (dataSet && Object.keys(dataSet).length > 0) {
+    var rows = [];
+
+    // Iterate over the data
+    for (var key in dataSet) {
+      if (dataSet.hasOwnProperty(key)) {
+        var rowData = dataSet[key];
+        rows.push([rowData.dayNight, rowData.ratings, rowData.route, rowData.season, rowData.seat1, rowData.seat2, rowData.seat3, rowData.totalSeat]);
+      }
+    }
+
+    // Clear existing data in the sheet
+    sheet.clearContents();
+
+    // Write the new data to the sheet
+    dataRange = sheet.getRange(2, 1, rows.length, 8);
+    dataRange.setValues(rows);
+  } else {
+    Logger.log("No data found");
+  }
+}
